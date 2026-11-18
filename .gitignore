@@ -1,0 +1,13 @@
+# Artefatos gerados pelo LaTeX
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+
+# PDFs de compilação do artigo
+/Main.pdf

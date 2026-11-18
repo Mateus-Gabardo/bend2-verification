@@ -1,0 +1,56 @@
+\section{Introdução}
+\label{sect:intro}
+
+A manutenção de software envolve alterações na implementação que podem introduzir regressões, inclusive quando geradas com auxílio de ferramentas de inteligência artificial. Uma alternativa para reduzir esse risco é explicitar as propriedades esperadas de uma função e verificá-las após cada mudança, de modo a identificar violações antes que se propaguem. Na programação funcional, a imutabilidade e a ausência de efeitos colaterais fazem com que o resultado de uma função dependa apenas de suas entradas, o que facilita descrever o que ela deve fazer. No entanto, isso não garante que as violações sejam detectadas: essa detecção depende do mecanismo de verificação utilizado e do que ele consegue cobrir.
+
+Uma propriedade comportamental expressa uma condição que a função deve satisfazer. Em uma operação de reserva de estoque, por exemplo, pode-se exigir que uma reserva aceita preserve a soma das quantidades disponíveis e reservadas. Enquanto testes verificam o comportamento nos casos executados, uma prova formal busca demonstrar uma propriedade para todas as entradas abrangidas por sua formulação, sob as hipóteses estabelecidas.
+
+A linguagem Bend apresenta características funcionais associadas à execução paralela. Barros e Souza \cite{se4fp} discutem a imutabilidade e o paralelismo nativo nesse contexto. A partir dessas características, também é possível investigar como o comportamento de uma função pode ser especificado e verificado quando sua implementação é alterada. Para isso, este estudo considera o Bend 2 e consulta sua documentação oficial \cite{BendGuide} para identificar os recursos disponíveis.
+
+A associação de propriedades verificáveis a programas também é discutida por Sakkas et al. \cite{SakkasEtAl2025}, que exploram a inferência modular de tipos de refinamento para programas Haskell e utilizam o LiquidHaskell para verificá-los. Esse trabalho fornece uma referência conceitual para a análise de propriedades, embora seus mecanismos não sejam atribuídos ao Bend 2.
+
+Nesse contexto, formula-se a seguinte pergunta de pesquisa: \textit{em que medida as características funcionais do Bend 2 permitem especificar e verificar propriedades de uma função sujeita a alterações, e com quais limites?}
+
+
+Para responder à pergunta, o objetivo geral é investigar como essas características apoiam a especificação e a verificação de propriedades comportamentais após mudanças controladas na implementação de uma função. Como objetivos específicos, pretende-se identificar as características funcionais relevantes; definir uma função e suas propriedades antes das alterações; verificar essas propriedades em cada versão da implementação; e analisar os recursos necessários e as limitações encontradas.
+
+A investigação será conduzida como um estudo de caso técnico e exploratório, utilizando uma função de reserva de estoque. Após a definição das propriedades e de uma versão de referência, serão examinadas alterações que preservem o comportamento esperado, alterações com erros introduzidos intencionalmente e mudanças sugeridas por uma ferramenta de IA. Em cada versão, serão registrados os procedimentos de verificação e as evidências obtidas.
+
+A contribuição esperada é uma caracterização prática dos recursos e procedimentos que apoiam a especificação e a verificação nesse caso, incluindo seus limites. A análise distinguirá os resultados de testes, eventuais garantias fornecidas pela linguagem e verificações realizadas por ferramentas externas.
+
+\section{Metodologia}
+\label{sect:metodologia}
+
+A pesquisa será conduzida como um estudo de caso técnico, exploratório e de natureza aplicada. Serão comparadas versões de uma função de reserva de estoque implementada em Bend 2, para analisar como suas características funcionais apoiam a especificação e a verificação de propriedades após alterações no código.
+
+A função receberá uma lista de produtos, um identificador de produto e a quantidade solicitada. Cada produto terá suas quantidades disponíveis e reservadas. O resultado será uma nova lista com a reserva efetuada ou uma indicação de recusa, preservando o estoque original quando a solicitação não puder ser atendida. Antes da implementação, serão definidos os tipos de dados, as condições de entrada e as regras de aceitação e recusa.
+
+A implementação utilizará coleções para representar o estoque e recursão para percorrer os produtos. O casamento de padrões tratará os casos da lista e os resultados da operação. Funções nomeadas organizarão a busca, a validação e a atualização das quantidades. Uma função anônima expressará o critério de seleção do produto e será passada como argumento à função de busca. A operação será implementada de forma pura, retornando novos valores sem modificar os recebidos.
+
+O procedimento será organizado em quatro etapas:
+
+\begin{enumerate}
+	\item Definir as regras de aceitação e recusa da reserva e as propriedades que serão verificadas: atualização correta das quantidades disponíveis e reservadas, conservação da soma dessas quantidades e preservação dos demais produtos. Solicitações superiores à disponibilidade deverão ser recusadas sem alterar o estoque.
+	
+	\item Implementar a função em Bend 2 com os recursos funcionais previstos, declarar as propriedades e construir as provas correspondentes. Serão registrados os procedimentos utilizados e as dificuldades encontradas.
+	
+	\item Criar versões independentes a partir da referência, com uma alteração por vez: uma reorganização que preserve o comportamento, um erro intencional e uma mudança realizada com auxílio de IA. As mesmas propriedades serão verificadas em cada versão, registrando eventuais adaptações nas provas.
+	
+	\item Comparar os resultados por versão e propriedade, distinguindo violações identificadas, provas que precisaram de adaptação e dificuldades não resolvidas. A análise discutirá como as características funcionais contribuíram para especificar e verificar as propriedades e quais limites foram encontrados.
+\end{enumerate}
+
+A documentação oficial do Bend 2 \cite{BendGuide} orientará a declaração das propriedades, a construção das provas e sua verificação. Testes com entradas concretas poderão auxiliar a execução e o diagnóstico, sendo registrados separadamente das provas. Uma prova não aceita será investigada para determinar se houve uma violação da propriedade, necessidade de adaptar a prova ou uma dificuldade que permaneça sem solução. As propriedades serão mantidas durante a comparação, e as adaptações nas provas serão registradas separadamente das mudanças na implementação.
+
+Para permitir a repetição do procedimento, serão preservados o código de cada versão, as propriedades, as provas, os comandos e as saídas da verificação. Também serão registrados a versão ou o commit do Bend 2, o ambiente de execução e as dependências utilizadas. No uso de IA, serão documentados a ferramenta, o modelo, a data, as instruções fornecidas, o código produzido e eventuais ajustes manuais.
+
+A análise será qualitativa e descritiva. Seus limites incluem o uso de uma única operação, a seleção das propriedades e alterações pelos pesquisadores e a variabilidade das respostas da IA. As conclusões ficarão restritas ao caso e às condições avaliadas, sem generalizar os resultados para outros programas ou para a confiabilidade da ferramenta de IA.
+
+\section{Resultados e Discussão}
+\label{sect:resultados}
+
+\textit{Seção a preencher após a execução do estudo.} Apresentar a função selecionada, as propriedades formuladas, as versões de implementação e os mecanismos testados. Para cada propriedade, registrar se foi possível expressá-la, qual procedimento foi usado para verificá-la e que evidência foi obtida. Discutir diferenças entre verificações por testes e garantias estáticas ou formais, além de limitações da linguagem, ferramentas e desenho experimental. Não antecipar resultados antes de executar os procedimentos descritos.
+
+\section{Conclusões}
+\label{sect:concl}
+
+\textit{Seção a preencher após a análise dos resultados.} Responder à pergunta de pesquisa com base nas evidências obtidas, sintetizar os recursos que apoiaram a especificação e a verificação, explicitar as limitações e indicar trabalhos futuros. A conclusão deverá restringir suas afirmações à função, às propriedades, às versões e às ferramentas efetivamente avaliadas.

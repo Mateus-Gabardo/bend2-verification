@@ -1,0 +1,51 @@
+TEMA E REFERENCIAS PARA O ARTIGO SOBRE BEND 2
+
+Ideia geral
+
+O artigo pretende investigar como características da programação funcional presentes no Bend 2 podem ajudar a especificar e verificar propriedades de uma função quando seu código é alterado. Em termos simples, a pesquisa parte de uma função, define o que deve continuar verdadeiro sobre seu comportamento e observa se essas condições podem ser expressas e verificadas durante alterações na implementação.
+
+A pergunta de pesquisa definida é:
+
+“Como características da programação funcional no Bend 2 ajudam a especificar e verificar propriedades de uma função sujeita a alterações?”
+
+O recorte mantém a programação funcional como foco. O Bend 2 será o ambiente usado para explorar a questão, considerando aspectos como imutabilidade e o estilo de programação funcional. A proposta não deve pressupor que o Bend 2 já oferece, por si só, um sistema completo de provas formais para qualquer função: isso precisa ser verificado tecnicamente durante o estudo. A pesquisa poderá delimitar quais propriedades podem ser expressas, quais mecanismos da linguagem ou ferramentas são necessários e quais limitações aparecem.
+
+Como os artigos relacionados fundamentam a proposta
+
+1. Artigo sobre Bend apresentado no SE4FP 2025
+
+BARROS, Ramon C. Jales de; SOUZA, Samuel Xavier de. “Bend: Immutability and Native Parallelism as a Solution to Parallel Programming Challenges”. Anais do I Workshop em Engenharia de Software para Programação Funcional (SE4FP), 2025, p. 21–26.
+
+DOI: https://doi.org/10.5753/se4fp.2025.13667
+Página do artigo: https://sol.sbc.org.br/index.php/se4fp/article/view/37104
+
+Este é o artigo-base sobre a linguagem Bend. Ele apresenta a imutabilidade e o paralelismo nativo como características relevantes da linguagem e ajuda a contextualizar o Bend como linguagem funcional. Ele fundamenta a escolha do objeto de estudo, mas seu foco principal é paralelismo; portanto, não responde diretamente à pergunta deste novo artigo sobre especificação e verificação de propriedades durante mudanças no código. Essa diferença ajuda a delimitar a contribuição pretendida.
+
+2. Artigo sobre inferência de propriedades com verificação
+
+SAKKAS, Georgios; SAHU, Pratyush; ONG, Kyeling; JHALA, Ranjit. “Neurosymbolic Modular Refinement Type Inference”. Proceedings of the 47th IEEE/ACM International Conference on Software Engineering (ICSE 2025), p. 846–858.
+
+DOI: https://doi.org/10.1109/ICSE55347.2025.00090
+Página oficial da conferência: https://conf.researchr.org/details/icse-2025/icse-2025-research-track/115/Neurosymbolic-Modular-Refinement-Type-Inference
+Preprint dos autores: https://ranjitjhala.github.io/static/icse25-neurosymbolic-refinement-inference.pdf
+
+O trabalho estuda a geração de anotações de tipos de refinamento para programas Haskell e usa o verificador LiquidHaskell para conferir as propriedades propostas. Ele é relevante como referência para a ideia de associar funções a propriedades verificáveis e avaliar se essas propriedades ajudam a garantir correção. A relação com o artigo proposto é conceitual e metodológica: o estudo não trabalha com Bend 2. Se a pesquisa não incluir inteligência artificial, o uso de IA nesse artigo deve ser tratado apenas como contexto, não como parte obrigatória do escopo.
+
+3. Documentação oficial do Bend
+
+Bend Guide (repositório oficial): https://github.com/HigherOrderCO/Bend/blob/main/GUIDE.md
+Repositório do Bend: https://github.com/HigherOrderCO/Bend
+Site do projeto: https://bend-lang.com/
+
+A documentação deve ser consultada para confirmar os recursos atuais da linguagem e para implementar os exemplos do estudo. Como documentação e ferramentas podem mudar, registrar a versão do Bend utilizada será importante para que os resultados possam ser reproduzidos.
+
+4. Referência técnica sobre HVM2
+
+TAELIN, Victor. “HVM2: A parallel evaluator for interaction combinators”. Texto técnico disponível no repositório do HVM:
+https://github.com/HigherOrderCO/HVM/blob/main/paper/HVM2.pdf
+
+Essa referência ajuda a compreender a base de execução paralela associada ao ecossistema do Bend. É complementar para contextualizar a linguagem, mas não substitui literatura específica sobre especificação formal, tipos de refinamento ou verificação de propriedades.
+
+Síntese do posicionamento
+
+O artigo sobre Bend do SE4FP 2025 oferece a base para apresentar a linguagem e suas características funcionais. O trabalho de Sakkas e coautores oferece uma referência para discutir propriedades associadas a funções e sua verificação. A proposta do novo artigo aproxima esses dois pontos em um estudo exploratório com Bend 2: definir propriedades para uma função, realizar alterações controladas e analisar como é possível verificar se as propriedades permanecem válidas. O resultado esperado é uma análise dos recursos, do procedimento necessário e dos limites encontrados, sem antecipar que a linguagem consiga provar automaticamente todas as propriedades.

@@ -1,0 +1,52 @@
+\documentclass[sigconf]{acmart}
+
+% Configuração CBSoft/ACM-like baseada no template oficial fornecido.
+\settopmatter{printacmref=false}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+\setcopyright{none}
+\acmConference[SE4FP 2026]{Workshop em Engenharia de Software para Programação Funcional}{2026}{Brasil}
+
+% O artigo está sendo preparado em português.
+\renewcommand{\abstractname}{Resumo}
+\renewcommand{\keywordsname}{Palavras-chave}
+\renewcommand{\refname}{Referências}
+
+\begin{document}
+
+\title[Propriedades em Funções Bend 2]{Especificação e Verificação de Propriedades em Funções Bend 2 sob Alterações Controladas}
+
+\author{Mateus Gabardo Lemos}
+\affiliation{
+  \institution{Universidade Tecnológica Federal do Paraná}
+  \city{Curitiba}
+  \country{Brasil}
+}
+\email{gabardomateus@gmail.com}
+
+\author{Adolfo Gustavo Serra Seca Neto}
+\affiliation{
+  \institution{Universidade Tecnológica Federal do Paraná}
+  \city{Curitiba}
+  \country{Brasil}
+}
+\email{adolfo@utfpr.edu.br}
+
+\renewcommand{\shortauthors}{Lemos and Serra Seca Neto}
+
+\begin{abstract}
+Este artigo investiga como características da programação funcional presentes em Bend 2 podem apoiar a especificação e a verificação de propriedades de uma função sujeita a alterações. Será conduzido um estudo exploratório com uma função e propriedades comportamentais definidas antes de mudanças controladas na implementação. Para cada versão, serão examinadas formas de expressar e verificar as propriedades, distinguindo garantias fornecidas pela linguagem de verificações realizadas por ferramentas ou procedimentos externos. A análise registrará os recursos necessários, a reprodutibilidade e as limitações encontradas, sem pressupor que Bend 2 ofereça provas formais automáticas gerais.
+\end{abstract}
+
+\keywords{Programação funcional, Bend 2, Especificação de propriedades, Verificação de software}
+
+\maketitle
+
+\input{tex/Corpo}
+
+\section*{Disponibilidade de Artefatos}
+Os artefatos de implementação, scripts e dados de execução serão disponibilizados em repositório público assim que a implementação for concluída. O link será incluído nesta seção antes da entrega final.
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{Ref/Referencias}
+
+\end{document}

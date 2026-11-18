@@ -1,0 +1,94 @@
+ESQUELETO DO ARTIGO
+
+1. INTRODUÇÃO
+
+Apresentar o uso de ferramentas de IA para gerar e alterar código e a necessidade de verificar se as mudanças preservam o comportamento esperado.
+
+Relacionar esse problema à programação funcional, especialmente à imutabilidade e às funções sem efeitos colaterais. Apresentar o Bend 2, seus recursos de especificação e prova, e a relação do estudo com o artigo de Barros e Souza.
+
+Apresentar a pergunta de pesquisa:
+
+Como características da programação funcional no Bend 2 ajudam a especificar e verificar propriedades de uma função sujeita a alterações?
+
+Na sequência, apresentar o objetivo geral e os três objetivos específicos em texto contínuo. Encerrar com uma breve descrição da função de reserva de estoque e da organização do artigo.
+
+2. METODOLOGIA
+
+Descrever a condução do estudo:
+
+- Definição da função de reserva de estoque e de suas regras.
+- Implementação funcional da reserva em Bend 2.
+- Especificação de propriedades e construção de provas.
+- Criação de versões com alterações corretas e erros introduzidos intencionalmente.
+- Solicitação e análise de alterações com auxílio de IA.
+- Verificação das propriedades após cada mudança.
+- Registro e comparação dos resultados, das dificuldades e dos limites encontrados.
+
+Registrar a versão do Bend 2, a ferramenta e o modelo de IA, além das instruções usadas para solicitar as alterações.
+
+3. FUNDAMENTAÇÃO TEÓRICA
+
+3.1. Programação funcional
+
+Apresentar imutabilidade, funções puras e ausência de efeitos colaterais. Explicar como essas características permitem descrever uma operação pela relação entre suas entradas e seu resultado.
+
+3.2. Bend e Bend 2
+
+Apresentar o artigo de Barros e Souza e sua análise da imutabilidade no Bend. Em seguida, descrever o Bend 2 e distinguir a versão usada no artigo de referência daquela adotada no experimento.
+
+3.3. Especificação e verificação de propriedades
+
+Explicar o que são propriedades, como são declaradas por meio de leis e como as provas são verificadas no Bend 2. Apresentar a diferença entre uma prova aceita, uma propriedade violada e uma prova que precisa ser adaptada.
+
+3.4. Alterações de código com apoio de IA
+
+Apresentar o uso de ferramentas de IA para modificar código e a necessidade de verificar se as alterações preservam as regras definidas.
+
+4. ESPECIFICAÇÃO E VERIFICAÇÃO DA RESERVA DE ESTOQUE
+
+4.1. Descrição da função
+
+Apresentar a regra de reserva, suas entradas e saídas. Explicar como a função recebe o estoque anterior e retorna um novo estado ou uma recusa.
+
+4.2. Características funcionais da implementação
+
+Mostrar onde aparecem a imutabilidade e a ausência de efeitos colaterais. Explicar como a relação entre o estoque recebido e o resultado permite descrever o comportamento da função.
+
+4.3. Especificação das propriedades
+
+Apresentar as propriedades propostas:
+
+- Conservação do total de itens disponíveis e reservados.
+- Atualização correta das quantidades após uma reserva aceita.
+- Recusa de solicitações maiores que a quantidade disponível.
+- Aceitação de solicitações que atendam às condições definidas.
+
+4.4. Construção das provas
+
+Apresentar como as propriedades foram declaradas no Bend 2 e como as provas foram construídas. Descrever os recursos utilizados e as dificuldades encontradas.
+
+4.5. Alterações na implementação
+
+Apresentar as versões produzidas:
+
+- Uma alteração que preserve o comportamento.
+- Erros introduzidos intencionalmente na atualização e na validação da reserva.
+- Alterações sugeridas pela ferramenta de IA.
+
+Para cada versão, descrever o que mudou e qual comportamento se espera observar.
+
+4.6. Análise dos resultados
+
+Comparar as versões e registrar quais propriedades permaneceram comprovadas, quais deixaram de ser comprovadas e quais erros foram identificados ou passaram despercebidos.
+
+Discutir como as características funcionais ajudaram a formular e verificar as propriedades. Apresentar uma comparação conceitual com uma operação que modifica estado, deixando claro o alcance dessa comparação.
+
+5. CONCLUSÃO
+
+Responder à pergunta de pesquisa a partir dos resultados. Retomar a contribuição da programação funcional para a especificação e a prova, o comportamento das provas diante das alterações e o uso da IA no experimento.
+
+Apresentar as limitações: cobertura das propriedades, dificuldades de construção das provas, alcance do caso estudado e tratamento de operações simultâneas. Encerrar com possibilidades de trabalhos futuros.
+
+REFERÊNCIAS
+
+Listar o artigo de Barros e Souza, a documentação da versão utilizada do Bend 2 e os trabalhos que fundamentarem programação funcional, verificação de propriedades e alterações de código com IA.
