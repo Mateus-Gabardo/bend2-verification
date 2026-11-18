@@ -9,5 +9,3 @@
 *.synctex.gz
 *.toc
 
-# PDFs de compilação do artigo
-/Main.pdf
