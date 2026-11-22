@@ -45,6 +45,49 @@ Para permitir a repetição do procedimento, serão preservados o código de cad
 
 A análise será qualitativa e descritiva. Seus limites incluem o uso de uma única operação, a seleção das propriedades e alterações pelos pesquisadores e a variabilidade das respostas da IA. As conclusões ficarão restritas ao caso e às condições avaliadas, sem generalizar os resultados para outros programas ou para a confiabilidade da ferramenta de IA.
 
+\section{Programação funcional e verificação de propriedades}
+
+A programação funcional é uma abordagem na qual programas são construídos a partir de funções que podem ser combinadas para formar operações mais complexas. Hughes \cite{Hughes1989} destaca que a composição de funções contribui para a construção modular de programas, permitindo que operações menores sejam reunidas para resolver problemas mais amplos.
+
+Além da composição, a pureza é uma característica importante para a compreensão do comportamento das funções. Uma função pura não produz efeitos colaterais observáveis e, para as mesmas entradas, produz o mesmo resultado. Dessa forma, sua análise pode se concentrar na relação entre os argumentos recebidos e o valor retornado \cite{Sabry1998,HuHughesWang2015}.
+
+Outra característica associada à programação funcional é a imutabilidade. Dados imutáveis não são alterados após sua criação; quando uma operação representa uma mudança, ela produz um novo valor com o resultado. No contexto da execução paralela, essa característica permite que diferentes partes de um programa acessem os mesmos dados sem modificá-los. Ao analisar o Bend, Barros e Souza \cite{se4fp} relacionam a imutabilidade à redução de conflitos no acesso a dados compartilhados, contribuindo para a execução paralela sem a necessidade de sincronizar alterações nesses dados.
+
+A relação entre entradas e resultados também favorece o raciocínio sobre programas. Affeldt, Garrigue e Saikawa \cite{AffeldtEtAl2025} explicam que programas funcionais puros são adequados ao raciocínio equacional, pois suas expressões apresentam transparência referencial. Essa característica permite relacionar expressões e seus resultados durante a análise de propriedades.
+
+Entretanto, a pureza e a imutabilidade não garantem, por si só, que uma função satisfaça as regras pretendidas. Uma implementação pode produzir sempre o mesmo resultado para uma entrada e, ainda assim, produzir um resultado incorreto. Assim, para avaliar seu comportamento, é necessário definir as propriedades esperadas e verificar se a função as satisfaz.
+
+Uma propriedade comportamental expressa uma condição que deve ser satisfeita por uma função. Na reserva de estoque, por exemplo, pode-se exigir que uma reserva aceita preserve a soma das quantidades disponíveis e reservadas. Essa condição descreve uma relação esperada entre a entrada e o resultado da operação.
+
+Uma forma de verificar propriedades é por meio de testes baseados em propriedades, nos quais diferentes entradas são utilizadas para avaliar as condições definidas. Claessen e Hughes \cite{ClaessenHughes2000} apresentam o QuickCheck, uma ferramenta para formular e testar propriedades em programas Haskell. Embora esses testes possam revelar violações, seus resultados se limitam às entradas executadas. Já uma prova formal busca demonstrar a propriedade para as entradas abrangidas por sua formulação, sob as hipóteses estabelecidas \cite{AffeldtEtAl2025}.
+
+A preservação do comportamento após alterações também pode ser investigada pela comparação entre programas. Kolesar, Piskac e Hallahan \cite{KolesarEtAl2025} apresentam uma abordagem para verificar a equivalência entre programas funcionais em Haskell, buscando provas de equivalência ou exemplos que revelem diferenças entre eles. Neste estudo, a comparação entre versões será realizada pela verificação de propriedades previamente definidas, o que permite avaliar as condições especificadas, mas não estabelece, por si só, a equivalência completa entre as implementações.
+
+Essa investigação também se relaciona ao uso de inteligência artificial no desenvolvimento de software. Bose \cite{Bose2025} identificou falhas em soluções geradas por modelos de linguagem por meio de testes baseados em propriedades. Em outra abordagem, Sakkas et al. \cite{SakkasEtAl2025} utilizaram modelos de linguagem para gerar anotações de tipos de refinamento em programas Haskell, verificadas com o LiquidHaskell.
+
+A aplicação desses mecanismos depende dos recursos oferecidos pela linguagem e pelas ferramentas utilizadas. Nesse contexto, o Bend 2 reúne características da programação funcional e recursos para a declaração e a verificação de propriedades, permitindo investigar como essas condições podem ser preservadas diante de alterações no código \cite{BendGuide}.
+
+\section{Bend 2: características e mecanismos de verificação}
+
+O Bend é uma linguagem de programação criada por Victor Taelin \cite{BendCredits} e lançada publicamente em 2024 \cite{Bend1Changelog}. A linguagem apresenta características da programação funcional associadas à execução paralela. Nesse contexto, Barros e Souza \cite{se4fp} analisam como a imutabilidade contribui para reduzir conflitos no acesso a dados compartilhados durante o processamento paralelo.
+
+Em 2026, o projeto passou a contar com o Bend 2, que mantém a relação com a programação funcional e a execução paralela. A nova implementação introduziu um verificador de tipos, um compilador e um ambiente de execução \cite{BendChangelog}. Sua documentação também apresenta recursos para declarar propriedades e construir provas, que serão utilizados neste estudo para analisar o comportamento de funções sujeitas a alterações \cite{BendGuide}.
+
+De acordo com sua documentação, o Bend 2 é uma linguagem funcional pura que oferece tipos de dados, funções, recursão e casamento de padrões. A linguagem também permite tratar funções como valores, possibilitando que sejam recebidas como argumentos ou retornadas por outras funções. Operações com efeitos, como leitura e escrita de arquivos, são representadas por meio do tipo \texttt{IO} \cite{BendGuide}.
+
+Além desses recursos, o Bend 2 utiliza um sistema de tipos dependentes, no qual tipos podem fazer referência a valores. Essa característica permite expressar propriedades sobre os dados e os resultados das funções. Para declarar essas propriedades, a linguagem oferece leis, identificadas pela palavra-chave \texttt{law} \cite{BendGuide}.
+
+Uma lei descreve uma condição que deve ser demonstrada. Por exemplo, pode-se declarar que a soma de um número natural com zero resulta no próprio número. A declaração, entretanto, não constitui uma prova por si só: para demonstrar a propriedade, é necessário construir uma definição associada à lei, cuja validade é analisada pelo verificador da linguagem \cite{BendGuide}.
+
+Na construção de provas, a documentação apresenta recursos como análise de casos, indução e reescrita de igualdades. Na análise de casos, a propriedade é examinada para as diferentes formas que uma entrada pode assumir. A indução permite utilizar uma prova para uma entrada menor na demonstração de uma entrada maior, enquanto a reescrita utiliza uma igualdade já estabelecida para transformar uma expressão durante a prova \cite{BendGuide}.
+
+
+A separação entre a lei e sua prova permite verificar novamente a propriedade após uma alteração na função relacionada. Se a prova for aceita, obtém-se uma garantia sobre a propriedade declarada, considerando as hipóteses e os recursos envolvidos. Caso seja rejeitada, é necessário investigar a causa: a alteração pode ter violado a propriedade, mas a prova também pode precisar de correção ou adaptação. Além disso, uma prova aceita não garante condições que não tenham sido expressas na especificação \cite{BendGuide}.
+
+Essa forma de verificação também pode apoiar a análise de código alterado com auxílio de inteligência artificial. Nesse contexto, as leis registram as condições esperadas, enquanto as definições associadas fornecem as provas a serem verificadas. A utilidade dessas garantias depende, portanto, de como as propriedades são formuladas e de sua correspondência com as regras da operação.
+
+Em uma operação de reserva de estoque, por exemplo, essas regras envolvem tanto a aceitação ou a recusa de uma solicitação quanto a relação entre as quantidades antes e depois da reserva. Sua descrição por meio de propriedades permite examinar se alterações na implementação preservam as condições estabelecidas para a operação.
+
 \section{Resultados e Discussão}
 \label{sect:resultados}
 
