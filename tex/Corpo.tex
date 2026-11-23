@@ -14,7 +14,7 @@ Nesse contexto, formula-se a seguinte pergunta de pesquisa: \textit{em que medid
 
 Para responder à pergunta, o objetivo geral é investigar como essas características apoiam a especificação e a verificação de propriedades comportamentais após mudanças controladas na implementação de uma função. Como objetivos específicos, pretende-se identificar as características funcionais relevantes; definir uma função e suas propriedades antes das alterações; verificar essas propriedades em cada versão da implementação; e analisar os recursos necessários e as limitações encontradas.
 
-A investigação será conduzida como um estudo de caso técnico e exploratório, utilizando uma função de reserva de estoque. Após a definição das propriedades e de uma versão de referência, serão examinadas alterações que preservem o comportamento esperado, alterações com erros introduzidos intencionalmente e mudanças sugeridas por uma ferramenta de IA. Em cada versão, serão registrados os procedimentos de verificação e as evidências obtidas.
+A investigação será conduzida como um estudo de caso técnico e exploratório, utilizando uma função de reserva de estoque. Após a definição das propriedades e de uma versão de referência, será examinada uma alteração realizada com auxílio de IA, com um erro introduzido intencionalmente. Em cada versão, serão registrados os procedimentos de verificação e as evidências obtidas.
 
 A contribuição esperada é uma caracterização prática dos recursos e procedimentos que apoiam a especificação e a verificação nesse caso, incluindo seus limites. A análise distinguirá os resultados de testes, eventuais garantias fornecidas pela linguagem e verificações realizadas por ferramentas externas.
 
@@ -23,7 +23,7 @@ A contribuição esperada é uma caracterização prática dos recursos e proced
 
 A pesquisa será conduzida como um estudo de caso técnico, exploratório e de natureza aplicada. Serão comparadas versões de uma função de reserva de estoque implementada em Bend 2, para analisar como suas características funcionais apoiam a especificação e a verificação de propriedades após alterações no código.
 
-A função receberá uma lista de produtos, um identificador de produto e a quantidade solicitada. Cada produto terá suas quantidades disponíveis e reservadas. O resultado será uma nova lista com a reserva efetuada ou uma indicação de recusa, preservando o estoque original quando a solicitação não puder ser atendida. Antes da implementação, serão definidos os tipos de dados, as condições de entrada e as regras de aceitação e recusa.
+A função receberá uma lista de produtos, um identificador de produto e a quantidade solicitada. Cada produto terá um identificador e suas quantidades disponíveis e reservadas. O resultado será uma nova lista com a reserva efetuada ou uma indicação de recusa, preservando o estoque original quando a solicitação não puder ser atendida. Antes da implementação, serão definidos os tipos de dados, as condições de entrada e as regras de aceitação e recusa.
 
 A implementação utilizará coleções para representar o estoque e recursão para percorrer os produtos. O casamento de padrões tratará os casos da lista e os resultados da operação. Funções nomeadas organizarão a busca, a validação e a atualização das quantidades. Uma função anônima expressará o critério de seleção do produto e será passada como argumento à função de busca. A operação será implementada de forma pura, retornando novos valores sem modificar os recebidos.
 
@@ -31,11 +31,11 @@ O procedimento será organizado em quatro etapas:
 
 \begin{enumerate}
 	\item Definir as regras de aceitação e recusa da reserva e as propriedades que serão verificadas: atualização correta das quantidades disponíveis e reservadas, conservação da soma dessas quantidades e preservação dos demais produtos. Solicitações superiores à disponibilidade deverão ser recusadas sem alterar o estoque.
-	
+
 	\item Implementar a função em Bend 2 com os recursos funcionais previstos, declarar as propriedades e construir as provas correspondentes. Serão registrados os procedimentos utilizados e as dificuldades encontradas.
-	
-	\item Criar versões independentes a partir da referência, com uma alteração por vez: uma reorganização que preserve o comportamento, um erro intencional e uma mudança realizada com auxílio de IA. As mesmas propriedades serão verificadas em cada versão, registrando eventuais adaptações nas provas.
-	
+
+	\item Criar, a partir da referência, uma versão alterada com auxílio de IA, cujas instruções introduzem intencionalmente um erro em um caso não coberto pelos testes unitários. As mesmas propriedades serão verificadas em cada versão, registrando eventuais adaptações nas provas.
+
 	\item Comparar os resultados por versão e propriedade, distinguindo violações identificadas, provas que precisaram de adaptação e dificuldades não resolvidas. A análise discutirá como as características funcionais contribuíram para especificar e verificar as propriedades e quais limites foram encontrados.
 \end{enumerate}
 
@@ -75,18 +75,54 @@ Em 2026, o projeto passou a contar com o Bend 2, que mantém a relação com a p
 
 De acordo com sua documentação, o Bend 2 é uma linguagem funcional pura que oferece tipos de dados, funções, recursão e casamento de padrões. A linguagem também permite tratar funções como valores, possibilitando que sejam recebidas como argumentos ou retornadas por outras funções. Operações com efeitos, como leitura e escrita de arquivos, são representadas por meio do tipo \texttt{IO} \cite{BendGuide}.
 
-Além desses recursos, o Bend 2 utiliza um sistema de tipos dependentes, no qual tipos podem fazer referência a valores. Essa característica permite expressar propriedades sobre os dados e os resultados das funções. Para declarar essas propriedades, a linguagem oferece leis, identificadas pela palavra-chave \texttt{law} \cite{BendGuide}.
+Além desses recursos, o Bend 2 utiliza um sistema de tipos dependentes, no qual tipos podem fazer referência a valores. Essa característica permite expressar propriedades sobre os dados e os resultados das funções. Taelin et al. \cite{BendTT} apresentam o BendTT como a teoria de tipos que constitui o núcleo da linguagem e descrevem como propriedades e provas podem ser representadas nesse sistema. No Bend 2, essas propriedades podem ser declaradas como leis, identificadas pela palavra-chave \texttt{law} \cite{BendGuide}.
 
 Uma lei descreve uma condição que deve ser demonstrada. Por exemplo, pode-se declarar que a soma de um número natural com zero resulta no próprio número. A declaração, entretanto, não constitui uma prova por si só: para demonstrar a propriedade, é necessário construir uma definição associada à lei, cuja validade é analisada pelo verificador da linguagem \cite{BendGuide}.
 
 Na construção de provas, a documentação apresenta recursos como análise de casos, indução e reescrita de igualdades. Na análise de casos, a propriedade é examinada para as diferentes formas que uma entrada pode assumir. A indução permite utilizar uma prova para uma entrada menor na demonstração de uma entrada maior, enquanto a reescrita utiliza uma igualdade já estabelecida para transformar uma expressão durante a prova \cite{BendGuide}.
-
 
 A separação entre a lei e sua prova permite verificar novamente a propriedade após uma alteração na função relacionada. Se a prova for aceita, obtém-se uma garantia sobre a propriedade declarada, considerando as hipóteses e os recursos envolvidos. Caso seja rejeitada, é necessário investigar a causa: a alteração pode ter violado a propriedade, mas a prova também pode precisar de correção ou adaptação. Além disso, uma prova aceita não garante condições que não tenham sido expressas na especificação \cite{BendGuide}.
 
 Essa forma de verificação também pode apoiar a análise de código alterado com auxílio de inteligência artificial. Nesse contexto, as leis registram as condições esperadas, enquanto as definições associadas fornecem as provas a serem verificadas. A utilidade dessas garantias depende, portanto, de como as propriedades são formuladas e de sua correspondência com as regras da operação.
 
 Em uma operação de reserva de estoque, por exemplo, essas regras envolvem tanto a aceitação ou a recusa de uma solicitação quanto a relação entre as quantidades antes e depois da reserva. Sua descrição por meio de propriedades permite examinar se alterações na implementação preservam as condições estabelecidas para a operação.
+
+\section{Especificação e verificação da reserva de estoque}
+
+Para analisar como leis e provas em Bend 2 se comportam diante de alterações na implementação, o caso de estudo precisava atender a alguns critérios. A função deveria ter regras suficientemente delimitadas para serem expressas por meio de propriedades, mas não tão simples a ponto de admitir uma única propriedade trivial. Também deveria permitir alterações plausíveis, capazes de preservar ou violar as condições especificadas de maneiras pouco evidentes à primeira leitura do código. Por fim, o tamanho da função deveria ser compatível com a construção manual das provas.
+
+A reserva de estoque foi escolhida por atender a esses critérios. A operação combina dois tipos de comportamento: uma decisão, que determina se a solicitação é aceita ou recusada, e uma atualização de valores, que altera as quantidades quando a reserva é aceita. Assim, é possível formular propriedades distintas para cada comportamento e observar qual delas é afetada por uma alteração. Além disso, a operação apresenta casos-limite, como uma solicitação nula ou igual à quantidade disponível. Nesses pontos, pequenas mudanças, como trocar uma comparação ou atualizar apenas uma das quantidades, podem alterar o resultado sem impedir a execução da função. Trata-se, ainda, de uma operação presente em sistemas comerciais, o que aproxima o caso de um contexto de aplicação prática.
+
+A função receberá uma lista de produtos, o identificador do produto a ser reservado e a quantidade solicitada. Cada produto conterá seu identificador e as quantidades de itens disponíveis e já reservados. A função deverá localizar o produto na lista e indicar se a solicitação foi aceita ou recusada, retornando o estoque correspondente ao resultado da operação.
+
+Uma reserva será aceita quando o produto for encontrado, a quantidade solicitada for maior que zero e não ultrapassar a quantidade disponível. Nesse caso, a quantidade solicitada será subtraída dos itens disponíveis e adicionada aos itens reservados do produto identificado. Os demais produtos deverão permanecer inalterados. Caso a solicitação não atenda a essas condições, a reserva será recusada e o estoque recebido será devolvido sem alterações.
+
+As quantidades serão representadas por números naturais, o que exclui valores negativos do domínio de entrada. A operação considerará a reserva de um único produto por solicitação e não abrangerá persistência de dados, cancelamento de reservas ou acesso simultâneo ao estoque.
+
+A partir dessas regras, as propriedades da função serão definidas antes da implementação e das alterações previstas no estudo. Além das condições de aceitação e recusa, essas propriedades descreverão a atualização do produto solicitado, a conservação da soma das quantidades e a preservação dos demais produtos da lista.
+
+A implementação da operação parte da definição dos dados que compõem o estoque e das possíveis respostas a uma solicitação. Cada produto é representado por um identificador e pelas quantidades de itens disponíveis e reservados. O Código~\ref{cod:produto} apresenta o tipo utilizado para reunir essas informações.
+
+\begin{verbatim}
+	type Produto is Data:
+	Produto{
+		identificador: Nat,
+		disponivel: Nat,
+		reservado: Nat
+	}
+\end{verbatim}
+
+O tipo \texttt{Nat} representa números naturais e é utilizado tanto para o identificador quanto para as quantidades. A escolha desse tipo impede a representação de valores negativos, embora, por si só, não determine se uma solicitação deve ser aceita ou recusada \cite{BendGuide}. Para evitar ambiguidades na busca, considera-se que cada produto possui um identificador único na lista de estoque.
+
+Além dos dados do produto, é necessário representar o resultado da operação. Para isso, o tipo apresentado a seguir distingue uma reserva aceita de uma reserva recusada. Em ambos os casos, o resultado contém a lista correspondente ao estoque após a solicitação.
+
+\begin{verbatim}
+	type ResultadoReserva is Data:
+	Aceita{estoque: List<Produto>}
+	Recusada{estoque: List<Produto>}
+\end{verbatim}
+
+Quando a reserva é aceita, a lista retornada contém a atualização das quantidades do produto solicitado. Quando é recusada, a lista corresponde ao estoque recebido, sem alterações. Essa distinção permite que as etapas seguintes tratem separadamente a decisão tomada e os valores devolvidos pela operação.
 
 \section{Resultados e Discussão}
 \label{sect:resultados}
