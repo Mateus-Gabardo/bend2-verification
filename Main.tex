@@ -6,6 +6,37 @@
 \setcopyright{none}
 \acmConference[SE4FP 2026]{Workshop em Engenharia de Software para Programação Funcional}{2026}{Brasil}
 
+% Código Bend 2 como bloco de código, no padrão dos anais SE4FP 2025 (ex.: ERLDA):
+% moldura, linhas numeradas e legenda curta logo abaixo do bloco. A legenda
+% usa o mesmo tamanho (small) das legendas de figura e tabela do template.
+\usepackage{listings}
+\renewcommand{\lstlistingname}{Código}
+\renewcommand{\figurename}{Figura}
+\renewcommand{\tablename}{Tabela}
+\lstdefinelanguage{Bend}{
+  morekeywords={def,law,for,match,case,type,is,import,as},
+  sensitive=true,
+  morecomment=[l]{\#},
+}
+\lstset{
+  language=Bend,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\bfseries,
+  commentstyle=\itshape,
+  frame=single,
+  numbers=left,
+  numberstyle=\tiny,
+  numbersep=6pt,
+  xleftmargin=12pt,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  captionpos=b,
+  aboveskip=6pt,
+  belowskip=6pt,
+}
+\captionsetup[lstlisting]{font=small, skip=3pt}
+
 % O artigo está sendo preparado em português.
 \renewcommand{\abstractname}{Resumo}
 \renewcommand{\keywordsname}{Palavras-chave}
@@ -34,7 +65,7 @@
 \renewcommand{\shortauthors}{Lemos and Serra Seca Neto}
 
 \begin{abstract}
-Este artigo investiga como características da programação funcional presentes em Bend 2 podem apoiar a especificação e a verificação de propriedades de uma função sujeita a alterações. Será conduzido um estudo exploratório com uma função e propriedades comportamentais definidas antes de mudanças controladas na implementação. Para cada versão, serão examinadas formas de expressar e verificar as propriedades, distinguindo garantias fornecidas pela linguagem de verificações realizadas por ferramentas ou procedimentos externos. A análise registrará os recursos necessários, a reprodutibilidade e as limitações encontradas, sem pressupor que Bend 2 ofereça provas formais automáticas gerais.
+Este artigo investiga em que medida características da programação funcional presentes no Bend 2 permitem especificar e verificar propriedades de uma função sujeita a alterações. Em um estudo de caso exploratório, uma função de reserva de estoque foi implementada com funções puras, casamento de padrões, recursão sobre listas e uma função anônima passada como parâmetro, e seu comportamento foi declarado como leis gerais e testes unitários, ambos verificados pelo próprio compilador da linguagem. Uma versão alterada com auxílio de inteligência artificial, com um erro introduzido intencionalmente no caso de produto esgotado, continuou aceita por todos os testes unitários, mas violou as leis de atualização e de conservação das quantidades. Também foi provado que nenhum teste unitário que não esgote o produto distinguiria as duas versões. A pureza, a imutabilidade, o casamento de padrões e a recursão permitiram escrever os requisitos como igualdades e construir provas que seguem a estrutura do código. Os limites observados incluem o volume das provas, sua dependência da implementação e restrições da linguagem.
 \end{abstract}
 
 \keywords{Programação funcional, Bend 2, Especificação de propriedades, Verificação de software}

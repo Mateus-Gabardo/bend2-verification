@@ -16,7 +16,7 @@ Para responder à pergunta, o objetivo geral é investigar como essas caracterí
 
 A investigação será conduzida como um estudo de caso técnico e exploratório, utilizando uma função de reserva de estoque. Após a definição das propriedades e de uma versão de referência, será examinada uma alteração realizada com auxílio de IA, com um erro introduzido intencionalmente. Em cada versão, serão registrados os procedimentos de verificação e as evidências obtidas.
 
-A contribuição esperada é uma caracterização prática dos recursos e procedimentos que apoiam a especificação e a verificação nesse caso, incluindo seus limites. A análise distinguirá os resultados de testes, eventuais garantias fornecidas pela linguagem e verificações realizadas por ferramentas externas.
+A contribuição esperada é uma caracterização prática dos recursos e procedimentos que apoiam a especificação e a verificação nesse caso, incluindo seus limites. A análise distingue o que é garantido por testes unitários, que examinam entradas específicas, do que é garantido por leis gerais, demonstradas para todas as entradas pelo verificador do próprio Bend 2, sem o uso de ferramentas externas.
 
 \section{Metodologia}
 \label{sect:metodologia}
@@ -75,6 +75,8 @@ Em 2026, o projeto passou a contar com o Bend 2, que mantém a relação com a p
 
 De acordo com sua documentação, o Bend 2 é uma linguagem funcional pura que oferece tipos de dados, funções, recursão e casamento de padrões. A linguagem também permite tratar funções como valores, possibilitando que sejam recebidas como argumentos ou retornadas por outras funções. Operações com efeitos, como leitura e escrita de arquivos, são representadas por meio do tipo \texttt{IO} \cite{BendGuide}.
 
+A linguagem é distribuída como um único comando, \texttt{bend}, que primeiro verifica o arquivo e todos os módulos que ele importa e só depois executa ou compila o programa. Nessa verificação são conferidos os tipos, a terminação das funções recursivas e as provas das leis. Se o arquivo não possui a função \texttt{main}, o comando apenas verifica; se \texttt{main} devolve um valor, esse valor é calculado pelo próprio verificador e impresso; se devolve uma ação \texttt{IO}, o programa é compilado e executado. Para gerar um executável, o compilador emite um único arquivo em C, que serve tanto como programa para a CPU, compilado pelo \texttt{clang}, quanto como núcleo para a GPU, compilado por CUDA ou Metal; também é possível gerar código JavaScript. A opção \texttt{-{}-verdict} verifica as provas uma segunda vez com um núcleo menor, correspondente à teoria BendTT, cuja correção é demonstrada em Lean \cite{BendGuide,BendTT}.
+
 Além desses recursos, o Bend 2 utiliza um sistema de tipos dependentes, no qual tipos podem fazer referência a valores. Essa característica permite expressar propriedades sobre os dados e os resultados das funções. Taelin et al. \cite{BendTT} apresentam o BendTT como a teoria de tipos que constitui o núcleo da linguagem e descrevem como propriedades e provas podem ser representadas nesse sistema. No Bend 2, essas propriedades podem ser declaradas como leis, identificadas pela palavra-chave \texttt{law} \cite{BendGuide}.
 
 Uma lei descreve uma condição que deve ser demonstrada. Por exemplo, pode-se declarar que a soma de um número natural com zero resulta no próprio número. A declaração, entretanto, não constitui uma prova por si só: para demonstrar a propriedade, é necessário construir uma definição associada à lei, cuja validade é analisada pelo verificador da linguagem \cite{BendGuide}.
@@ -83,7 +85,7 @@ Na construção de provas, a documentação apresenta recursos como análise de 
 
 A separação entre a lei e sua prova permite verificar novamente a propriedade após uma alteração na função relacionada. Se a prova for aceita, obtém-se uma garantia sobre a propriedade declarada, considerando as hipóteses e os recursos envolvidos. Caso seja rejeitada, é necessário investigar a causa: a alteração pode ter violado a propriedade, mas a prova também pode precisar de correção ou adaptação. Além disso, uma prova aceita não garante condições que não tenham sido expressas na especificação \cite{BendGuide}.
 
-Essa forma de verificação também pode apoiar a análise de código alterado com auxílio de inteligência artificial. Nesse contexto, as leis registram as condições esperadas, enquanto as definições associadas fornecem as provas a serem verificadas. A utilidade dessas garantias depende, portanto, de como as propriedades são formuladas e de sua correspondência com as regras da operação.
+Essa forma de verificação também pode apoiar a análise de código alterado com auxílio de inteligência artificial. Nesse contexto, as leis registram as condições esperadas, enquanto as definições associadas fornecem as provas a serem verificadas. A documentação oficial propõe exatamente esse uso: o desenvolvedor descreve as regras da aplicação em um arquivo \texttt{LAWS.bend}, um agente de IA escreve o código e as provas em \texttt{PROOF.bend}, e o comando \texttt{bend PROOF.bend} deve ser executado antes que cada alteração seja aceita \cite{BendReadme}. Uma referência não oficial da linguagem oferece, inclusive, um texto de instrução pronto para agentes de IA, que inclui a instalação do Bend 2, pede que as leis sejam escritas e revisadas antes de qualquer prova e proíbe enfraquecer uma lei para que sua prova seja aceita \cite{BendAgents}. A utilidade dessas garantias depende, portanto, de como as propriedades são formuladas e de sua correspondência com as regras da operação.
 
 Em uma operação de reserva de estoque, por exemplo, essas regras envolvem tanto a aceitação ou a recusa de uma solicitação quanto a relação entre as quantidades antes e depois da reserva. Sua descrição por meio de propriedades permite examinar se alterações na implementação preservam as condições estabelecidas para a operação.
 
@@ -101,35 +103,179 @@ As quantidades serão representadas por números naturais, o que exclui valores 
 
 A partir dessas regras, as propriedades da função serão definidas antes da implementação e das alterações previstas no estudo. Além das condições de aceitação e recusa, essas propriedades descreverão a atualização do produto solicitado, a conservação da soma das quantidades e a preservação dos demais produtos da lista.
 
-A implementação da operação parte da definição dos dados que compõem o estoque e das possíveis respostas a uma solicitação. Cada produto é representado por um identificador e pelas quantidades de itens disponíveis e reservados. O Código~\ref{cod:produto} apresenta o tipo utilizado para reunir essas informações.
+A implementação da operação parte da definição dos dados que compõem o estoque e das possíveis respostas a uma solicitação. O Código~\ref{lst:tipos} apresenta os dois tipos utilizados.
 
-\begin{verbatim}
-	type Produto is Data:
-	Produto{
-		identificador: Nat,
-		disponivel: Nat,
-		reservado: Nat
-	}
-\end{verbatim}
+\begin{lstlisting}[caption={Tipos de dados do estoque.},label={lst:tipos}]
+type Product is Data:
+  Product{id: Nat, available: Nat, reserved: Nat}
 
-O tipo \texttt{Nat} representa números naturais e é utilizado tanto para o identificador quanto para as quantidades. A escolha desse tipo impede a representação de valores negativos, embora, por si só, não determine se uma solicitação deve ser aceita ou recusada \cite{BendGuide}. Para evitar ambiguidades na busca, considera-se que cada produto possui um identificador único na lista de estoque.
+type Outcome is Data:
+  Accepted{stock: List<&2, Product>}
+  Refused{stock: List<&2, Product>}
+\end{lstlisting}
 
-Além dos dados do produto, é necessário representar o resultado da operação. Para isso, o tipo apresentado a seguir distingue uma reserva aceita de uma reserva recusada. Em ambos os casos, o resultado contém a lista correspondente ao estoque após a solicitação.
+O tipo \texttt{Product} reúne o identificador do produto e suas quantidades disponível e reservada. O tipo \texttt{Nat} representa números naturais e é utilizado tanto para o identificador quanto para as quantidades; essa escolha impede a representação de valores negativos, embora, por si só, não determine se uma solicitação deve ser aceita ou recusada \cite{BendGuide}. O tipo \texttt{Outcome} distingue uma reserva aceita (\texttt{Accepted}) de uma recusada (\texttt{Refused}) e, em ambos os casos, carrega a lista correspondente ao estoque após a solicitação. Essa distinção permite tratar separadamente a decisão tomada e os valores devolvidos pela operação. Para evitar ambiguidades na busca, considera-se que cada produto possui um identificador único na lista de estoque.
 
-\begin{verbatim}
-	type ResultadoReserva is Data:
-	Aceita{estoque: List<Produto>}
-	Recusada{estoque: List<Produto>}
-\end{verbatim}
+A partir dessas regras, foram definidas cinco propriedades gerais, que devem valer para quaisquer estoque, identificador e quantidade, e cinco testes unitários, que fixam o resultado esperado para entradas específicas. A Tabela~\ref{tab:propriedades} apresenta ambos, e os identificadores P1 a P5 e T1 a T5 são usados no restante do texto. Nos testes, $E$ é o estoque \texttt{[Product\{7,10,2\}, Product\{8,5,0\}]}, em que cada produto é escrito como \texttt{Product\{id, available, reserved\}}.
 
-Quando a reserva é aceita, a lista retornada contém a atualização das quantidades do produto solicitado. Quando é recusada, a lista corresponde ao estoque recebido, sem alterações. Essa distinção permite que as etapas seguintes tratem separadamente a decisão tomada e os valores devolvidos pela operação.
+\begin{table}[!ht]
+\caption{Propriedades gerais e testes unitários da reserva.}
+\label{tab:propriedades}
+\small
+\begin{tabular}{@{}lp{0.82\columnwidth}@{}}
+\toprule
+ID & Descrição \\
+\midrule
+P1 & Um pedido válido é aceito: a quantidade sai do disponível e entra no reservado do produto pedido, inclusive quando o esgota, e os demais produtos permanecem iguais e na mesma ordem. \\
+P2 & Para qualquer pedido, aceito ou recusado, a soma das quantidades disponíveis e reservadas do estoque devolvido é igual à do estoque recebido. \\
+P3 & Um pedido maior que a quantidade disponível é recusado e devolve o estoque recebido. \\
+P4 & Um pedido de zero unidades é recusado e devolve o estoque recebido. \\
+P5 & Um pedido de produto inexistente é recusado e devolve o estoque recebido. \\
+\midrule
+T1 & Reservar 3 unidades do produto 7 em $E$ resulta em \texttt{[Product\{7,7,5\}, Product\{8,5,0\}]}. \\
+T2 & Reservar 2 unidades do produto 8 em $E$ resulta em \texttt{[Product\{7,10,2\}, Product\{8,3,2\}]}. \\
+T3 & Reservar 11 unidades do produto 7 em $E$ é recusado. \\
+T4 & Reservar zero unidade do produto 7 em $E$ é recusado. \\
+T5 & Reservar 1 unidade do produto 9, inexistente, em $E$ é recusado. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Nenhum dos testes pede exatamente a quantidade disponível de um produto. Essa lacuna foi mantida de propósito, pois o erro introduzido na versão alterada atinge justamente esse caso.
 
 \section{Resultados e Discussão}
 \label{sect:resultados}
 
-\textit{Seção a preencher após a execução do estudo.} Apresentar a função selecionada, as propriedades formuladas, as versões de implementação e os mecanismos testados. Para cada propriedade, registrar se foi possível expressá-la, qual procedimento foi usado para verificá-la e que evidência foi obtida. Discutir diferenças entre verificações por testes e garantias estáticas ou formais, além de limitações da linguagem, ferramentas e desenho experimental. Não antecipar resultados antes de executar os procedimentos descritos.
+A reserva de estoque foi implementada como uma composição de funções puras e nomeadas, distribuídas em quatro módulos conforme o papel de cada uma: os tipos em \texttt{src/stock.bend}, a validação e a atualização de um produto em \texttt{src/validation.bend}, a busca na lista em \texttt{src/search.bend} e a operação de reserva em \texttt{src/reserve.bend}. Essa organização, junto com as características funcionais da linguagem, foi o que permitiu comparar a versão de referência com a versão alterada usando um único critério: as mesmas leis.
+
+O ponto de partida é a pureza. No Bend 2, uma função não lê nem altera nada fora dos seus argumentos, e para as mesmas entradas devolve sempre o mesmo resultado. Assim, o comportamento de \texttt{reserve(stock, id, qty)} fica inteiramente determinado pelo estoque, pelo identificador e pela quantidade. Por isso cada requisito pôde ser escrito como uma igualdade entre expressões. Também por isso duas versões da função podem ser comparadas aplicando as mesmas igualdades a ambas, sem reproduzir nenhum estado externo. Se a função dependesse de algo fora dos argumentos, como um banco de dados, a mesma igualdade poderia ser verdadeira em uma execução e falsa em outra, e não poderia ser demonstrada apenas a partir do código.
+
+Essas igualdades ficam no arquivo \texttt{LAWS.bend}, apresentado em parte no Código~\ref{lst:leis}. As três primeiras linhas importam o programa e um segundo arquivo, \texttt{SPEC.bend}, com definições usadas apenas para escrever as leis.
+
+\begin{lstlisting}[caption={Trechos do arquivo de leis.},label={lst:leis}]
+import ./src/stock.bend as Stock
+import ./src/reserve.bend as Res
+import ./SPEC.bend as Spec
+
+law conserve_total:
+  for +s : List<&2, Stock.Product>
+  for +i : Nat
+  for +q : Nat
+  {Spec.total(Spec.stock_of(Res.reserve(s, i, q)))
+    == Spec.total(s) : Nat}
+
+law t1_accept_first:
+  {Res.reserve(Spec.sample(), 7n, 3n)
+    == Stock.Accepted{[Stock.Product{7n, 7n, 5n},
+         Stock.Product{8n, 5n, 0n}]} : Stock.Outcome}
+\end{lstlisting}
+
+Cada lei é declarada com a palavra \texttt{law}, seguida das variáveis que ela quantifica e da igualdade que deve valer. A lei \texttt{conserve\_total}, no Código~\ref{lst:leis}, corresponde à propriedade P2 da Tabela~\ref{tab:propriedades}: para qualquer estoque \texttt{s}, identificador \texttt{i} e quantidade \texttt{q}, a soma das quantidades disponíveis e reservadas é a mesma antes e depois da reserva. O \texttt{for} indica que a lei vale para todos os valores do tipo, e não para alguns exemplos; na terminologia da linguagem, a lei expressa um requisito como um tipo que a prova deve habitar \cite{BendLearn}. A função \texttt{total}, definida em \texttt{SPEC.bend}, soma as quantidades de toda a lista. Ela não faz parte do programa, mas é necessária para enunciar a propriedade. Quando uma lei depende de uma condição, essa condição também é escrita como um \texttt{for}. Na lei P1, por exemplo, \texttt{for ok : Spec.Absent(i, pre)} exige que nenhum produto anterior ao procurado tenha o mesmo identificador.
+
+Os testes unitários da Tabela~\ref{tab:propriedades} foram escritos no mesmo arquivo, como leis sem \texttt{for}. A última lei do Código~\ref{lst:leis}, \texttt{t1\_accept\_first}, corresponde ao teste T1 e fala de uma única entrada.
+
+Uma lei, por si só, apenas enuncia uma afirmação. Ela é validada por uma função de mesmo nome no arquivo \texttt{PROOF.bend}, cujo corpo é a prova. O comando \texttt{bend PROOF.bend} verifica todas as provas e só imprime \texttt{ALL PROOFS CHECK} quando todas as leis estão demonstradas. Se alguma prova não fecha, imprime \texttt{SOME PROOFS FAIL}, com o termo esperado, o termo obtido e a linha do erro. Como \texttt{LAWS.bend} e \texttt{SPEC.bend} não mudam entre as versões, enquanto o programa e as provas podem mudar, uma versão só é aceita se satisfizer exatamente os mesmos requisitos que a anterior.
+
+Para leis sobre entradas concretas, como T1, e para leis que se resolvem por cálculo direto, como a recusa do pedido nulo (P4), a prova é apenas \texttt{\{==\}}. Como a função é pura, o verificador calcula os dois lados da igualdade e confirma que coincidem. A imutabilidade torna essa última lei especialmente simples. Como mostra o Código~\ref{lst:recusa}, na recusa, \texttt{reserve} devolve o estoque que recebeu, sem modificá-lo.
+
+\begin{lstlisting}[caption={Recusa do pedido nulo.},label={lst:recusa}]
+  match qty:
+    case 0n:
+      Stock.Refused{stock}
+\end{lstlisting}
+
+Por isso a lei P4 pode ser escrita como \texttt{reserve(s, i, 0n) == Refused\{s\}}, com o mesmo \texttt{s} dos dois lados. Numa linguagem com atualização de dados no lugar, seria necessário comparar o estado do estoque antes e depois da chamada e demonstrar que nenhuma escrita ocorreu. Aqui, a entrada continua disponível e pode ser comparada diretamente com a saída.
+
+As leis que envolvem valores desconhecidos exigem provas que acompanham a estrutura do código, e é nesse ponto que o casamento de padrões e a recursão se mostram decisivos. A validação da quantidade, na função \texttt{take} (Código~\ref{lst:take}), separa os casos pelo casamento de padrões\footnote{Casamento de padrões. No Bend 2, ele é feito com \texttt{match}, seguido de um \texttt{case} para cada formato do valor: um natural é \texttt{0n} ou \texttt{1n+p}, e uma lista é \texttt{Nil\{\}} ou \texttt{p <> rest}. O verificador rejeita um \texttt{match} que não cubra todos os formatos.} sobre a quantidade pedida \texttt{n} e a disponível \texttt{a}: quando nada resta a retirar, sobra \texttt{a}; quando ainda falta retirar e não há estoque, a função recusa com \texttt{None\{\}}; nos demais casos, chama a si mesma com uma unidade a menos de cada lado, o que caracteriza a recursão\footnote{Recursão.}. O casamento de padrões ajuda a verificação de duas formas. Como o Bend 2 rejeita um casamento que não cubra todos os formatos da entrada, nenhuma situação fica sem tratamento no código; e, como cada situação é um caso separado, a prova pode conferir um caso de cada vez.
+
+\begin{lstlisting}[caption={Validação da quantidade.},label={lst:take}]
+def take(n: Nat, a: Nat) -> Maybe<&2, Nat>:
+  match n a:
+    case 0n _:
+      Some{a}
+    case 1n+np 0n:
+      None{}
+    case 1n+np 1n+ap:
+      take(np, ap)
+\end{lstlisting}
+
+A lei que afirma que retirar \texttt{q} unidades de \texttt{q + m} deixa \texttt{m}, apresentada com sua prova no Código~\ref{lst:take-ok}, repete essa forma.
+
+\begin{lstlisting}[caption={Lei sobre \texttt{take} e sua prova.},label={lst:take-ok}]
+law take_ok:
+  for q: Nat
+  for m: Nat
+  {Some{m} == take(q, Nat.add(q, m)) : Maybe<&2, Nat>}
+
+def take_ok(q, m):
+  match q:
+    case 0n:
+      {==}
+    case 1n+p:
+      take_ok(p, m)
+\end{lstlisting}
+
+O casamento de padrões sobre \texttt{q} vira uma análise de casos. No caso zero, os dois lados coincidem por cálculo. No caso \texttt{1+p}, a chamada \texttt{take\_ok(p, m)} usa a própria lei para um valor menor, o que constitui a hipótese de indução \cite{BendLearn}. A recursão no código corresponde, portanto, à indução na prova. A exigência do Bend 2 de que toda recursão diminua um argumento, como \texttt{np} e \texttt{ap} no Código~\ref{lst:take}, garante que as funções terminam, condição sem a qual uma prova não teria validade.
+
+O mesmo vale para o processamento da coleção\footnote{Processamento de coleções.}. Em \texttt{update\_where} (Código~\ref{lst:busca}), a lista de produtos é percorrida pelo casamento de padrões entre a lista vazia, \texttt{Nil\{\}}, e um produto \texttt{p} seguido do restante \texttt{rest}.
+
+\begin{lstlisting}[caption={Percurso da lista na busca.},label={lst:busca}]
+  match stock:
+    case Nil{}:
+      None{}
+    case +p <> +rest:
+      update_where.pick(
+        put_head(reserve_item(p, qty), rest),
+        keep_head(p,
+          update_where(~matches, rest, id, qty)),
+        matches(p, id))
+\end{lstlisting}
+
+Quando \texttt{p} é o produto procurado, ele é atualizado por \texttt{reserve\_item}; quando não é, ele é mantido e a função percorre \texttt{rest} por recursão. A lista é assim reconstruída sem que a original seja alterada. As provas sobre a lista seguem esses mesmos dois casos e fazem indução sobre a lista. Por isso as leis valem para estoques de qualquer tamanho, e não apenas para os do exemplo.
+
+A decisão de qual produto atualizar não está escrita dentro da busca. Ela chega por \texttt{matches}, uma função recebida como parâmetro\footnote{Funções de primeira classe, com uma função passada como parâmetro.} e aplicada na última linha do Código~\ref{lst:busca}. É \texttt{reserve} quem fornece esse critério, por meio da função anônima\footnote{Funções nomeadas e anônimas. No Bend 2, uma função nomeada é declarada com \texttt{def nome(...)}, e uma anônima é escrita no ponto de uso, como \texttt{x => corpo}. Uma função anônima comum só pode ser chamada uma vez; por isso, esta é passada com \texttt{\textasciitilde}, como parâmetro de template, para ser aplicada a cada produto.} \texttt{p => i => same\_id(p, i)}, destacada no Código~\ref{lst:anonima}.
+
+\begin{lstlisting}[caption={Função anônima passada à busca.},label={lst:anonima}]
+    case 1n+q:
+      reserve.fin(stock,
+        update_where(~(p => i => same_id(p, i)),
+          stock, id, 1n+q))
+\end{lstlisting}
+
+Separar o percurso da lista da regra de seleção permitiu provar cada parte separadamente: um lema trata do percurso, e outros garantem que o critério encontra o produto com o identificador pedido e ignora os demais. O símbolo \texttt{\textasciitilde} declara o critério como parâmetro de template, substituído em tempo de compilação. Isso foi necessário porque, no Bend 2, uma função anônima comum só pode ser chamada uma vez, e a busca precisa chamá-la para cada produto \cite{BendGuide}.
+
+Em síntese, cada característica teve um papel distinto na verificação. A pureza permitiu escrever os requisitos como igualdades; a imutabilidade permitiu comparar a saída diretamente com a entrada; o casamento de padrões garantiu que todas as situações fossem tratadas e organizou as provas em casos; a recursão permitiu provar as leis por indução, para entradas de qualquer tamanho; e a função passada como parâmetro separou o percurso da lista do critério de seleção, de modo que cada parte pôde ser provada isoladamente.
+
+Com essa estrutura, a versão de referência teve as cinco propriedades gerais (P1 a P5) e os cinco testes (T1 a T5) aceitos pelo verificador. A versão alterada com IA modificou apenas o módulo de busca, acrescentando a função do Código~\ref{lst:v1}, que remove o produto da lista quando o disponível chega a zero.
+
+\begin{lstlisting}[caption={Função acrescentada pela IA.},label={lst:v1}]
+def keep_if_stocked.go(id: Nat, available: Nat,
+    reserved: Nat, rest: List<&2, Product>)
+    -> List<&2, Product>:
+  match available:
+    case 0n:
+      rest
+    case 1n+ap:
+      Product{id, 1n+ap, reserved} <> rest
+\end{lstlisting}
+
+O caso \texttt{0n} descarta o produto e, com ele, as unidades que já estavam reservadas. Como as funções são puras e organizadas em módulos, a comparação pôde ser localizada. As provas que não dependem do módulo de busca, como as das recusas P3 a P5, continuaram aceitas sem nenhuma alteração. A falha apareceu justamente no lema que descreve o resultado da busca quando o produto é encontrado. Na versão alterada, as provas de P1 e P2 foram deixadas em aberto com a marcação \texttt{?TODO}, que o verificador aceita durante a escrita de uma prova, mas contabiliza como pendência \cite{BendLearn}.
+
+É nesse ponto que se observa a diferença entre um teste unitário e uma lei. Os cinco testes continuaram aceitos na versão alterada, porque nenhum deles pede todas as unidades disponíveis de um produto. T1, por exemplo, pede 3 das 10 unidades do produto 7, e o resultado continua com 7 disponíveis, sem passar pelo caso \texttt{0n} do Código~\ref{lst:v1}. As leis de atualização (P1) e de conservação (P2), por outro lado, deixaram de ser aceitas, porque quantificam todas as quantidades, inclusive aquela que esgota o produto. Para confirmar que se tratava de uma violação, e não de uma prova que apenas precisasse de ajuste, as duas leis foram aplicadas a um caso concreto. Com o estoque \texttt{[Product\{7,3,2\}, Product\{8,5,0\}]} e um pedido de 3 unidades do produto 7, a versão de referência devolve \texttt{Product\{7,0,5\}} na lista, enquanto a alterada devolve apenas \texttt{[Product\{8,5,0\}]}, e o verificador aponta que a soma das quantidades caiu de 10 para 5.
+
+Foi possível ir além e provar que nenhum teste unitário que não esgote um produto detectaria a alteração. Na versão alterada, provou-se a lei P1 restrita ao caso em que sobra ao menos uma unidade, e as leis de recusa P3 a P5 continuaram válidas. Juntas, essas leis determinam o resultado de qualquer pedido, exceto aquele em que a quantidade pedida é igual à disponível. As duas versões só diferem, portanto, nessa entrada, e um teste que não a escolha passa em ambas. A lei geral não depende de alguém escolher a entrada certa: ao valer para todas as quantidades, já inclui o caso que os testes deixaram de fora.
+
+Esses resultados também evidenciam limites da abordagem. O Bend 2 não procura provas automaticamente, e as provas deste estudo, escritas por um agente de IA, ocuparam cerca de 330 linhas, contra aproximadamente 90 do programa e 50 das leis. Embora as leis tenham permanecido iguais entre as versões, as provas citam funções internas e precisaram ser refeitas após a alteração, mesmo para propriedades que continuaram verdadeiras. A proibição de casar padrões sobre o resultado de uma chamada exigiu funções auxiliares adicionais, como \texttt{update\_where.pick} no Código~\ref{lst:busca}. Por fim, as garantias obtidas se restringem ao que as leis afirmam: nenhuma delas exige, por exemplo, que os identificadores sejam únicos.
 
 \section{Conclusões}
 \label{sect:concl}
 
-\textit{Seção a preencher após a análise dos resultados.} Responder à pergunta de pesquisa com base nas evidências obtidas, sintetizar os recursos que apoiaram a especificação e a verificação, explicitar as limitações e indicar trabalhos futuros. A conclusão deverá restringir suas afirmações à função, às propriedades, às versões e às ferramentas efetivamente avaliadas.
+Este estudo investigou em que medida as características funcionais do Bend 2 permitem especificar e verificar propriedades de uma função sujeita a alterações. No caso da reserva de estoque, essas características tornaram a especificação direta e a verificação abrangente. Como as funções são puras, cada requisito pôde ser escrito como uma igualdade entre a entrada e a saída. Como os dados são imutáveis, a recusa sem alteração do estoque pôde ser expressa com o próprio estoque recebido. E, como o código foi estruturado com casamento de padrões e recursão, as provas seguiram a mesma estrutura, por análise de casos e indução, e passaram a valer para estoques e quantidades quaisquer. A função anônima passada como parâmetro separou a busca do critério de seleção, e a composição em funções nomeadas e módulos restringiu a alteração a uma parte do código, cujas consequências puderam ser localizadas.
+
+A comparação entre as versões mostrou a diferença prática entre testes unitários e leis. A versão alterada com IA passou em todos os testes, mas violou as leis de atualização e de conservação, e foi possível provar que nenhum teste que não esgote o produto detectaria a alteração. Uma lei, por quantificar todas as entradas, cobre casos que os testes só cobririam se alguém os escolhesse.
+
+O volume das provas, principal custo aparente da abordagem, mostrou-se menos relevante do que parece. No fluxo proposto pela documentação, os desenvolvedores descrevem as regras em \texttt{LAWS.bend} e um agente de IA escreve o código e as provas \cite{BendReadme}. Neste estudo, as provas foram produzidas por um agente orientado pelo texto de instrução sugerido pela referência não oficial da linguagem \cite{BendAgents}, enquanto os autores revisaram as leis. Como o verificador rejeita qualquer prova incorreta, não é preciso revisar as provas linha a linha, e o esforço humano se concentra em formular leis que representem de fato as regras do negócio. Esse é também o ponto mais frágil: a garantia vale apenas para o que as leis afirmam, e uma regra mal formulada, ou ausente, como a unicidade dos identificadores neste caso, não é detectada pelo verificador.
+
+A linguagem também impõe limites. O Bend 2 não possui busca automática de provas nem táticas, o que torna as provas extensas e dependentes da implementação: mesmo leis que continuaram verdadeiras exigiram provas refeitas após a alteração. Restrições como a proibição de casar padrões sobre o resultado de uma chamada, a obrigação de declarar uma função antes de usá-la, a exigência de que a recursão diminua um argumento e o uso único de funções anônimas comuns levaram a funções auxiliares e a parâmetros de template. Uma prova rejeitada, por si só, não indica se a propriedade foi violada ou se a prova apenas precisa de ajuste, o que exigiu a construção de contraexemplos. Além disso, a linguagem é recente, sua documentação ainda está em evolução, e a verificação adicional pelo núcleo demonstrado em Lean não foi executada neste estudo.
+
+As conclusões se restringem a uma função, a uma alteração induzida intencionalmente e à versão 2.0.40 do Bend 2. Trabalhos futuros podem avaliar outras funções e alterações, comparar diferentes modelos de IA na escrita das provas e incluir a verificação pelo núcleo formal da linguagem.
