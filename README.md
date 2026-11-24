@@ -14,7 +14,7 @@ O código, as provas e os logs do experimento estão em [bend2-verification-impl
 
 ![Apresentação do artigo](Apresenta%C3%A7%C3%A3o.svg)
 
-A apresentação foi montada no Excalidraw. Para editá-la, abra `Apresentação.excalidraw` em [excalidraw.com](https://excalidraw.com).
+A apresentação foi montada no Excalidraw e pode ser aberta pelo [link público](https://excalidraw.com/#json=OsiRfypWAb5aIOmNHlnMT,qC-YczNebpoJUvUiN7fKaQ). Para editá-la localmente, abra `Apresentação.excalidraw` em [excalidraw.com](https://excalidraw.com).
 
 ## Conteúdo
 
