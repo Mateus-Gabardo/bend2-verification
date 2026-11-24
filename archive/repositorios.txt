@@ -1,0 +1,14 @@
+Características Funcionais na Verificação de Propriedades em Bend 2
+Mateus Gabardo Lemos e Adolfo Gustavo Serra Seca Neto (UTFPR)
+
+Repositório do artigo (texto, apresentação e PDF):
+https://github.com/Mateus-Gabardo/bend2-verification
+
+PDFs das referências:
+https://github.com/Mateus-Gabardo/bend2-verification/tree/main/archive
+
+Repositório da implementação (código, leis, provas e logs):
+https://github.com/Mateus-Gabardo/bend2-verification-impl
+
+Apresentação:
+https://excalidraw.com/#json=OsiRfypWAb5aIOmNHlnMT,qC-YczNebpoJUvUiN7fKaQ
